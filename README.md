@@ -150,38 +150,13 @@ The dashboard includes:
 
 ---
 
-## ⚙️ How to Run
 
-### Requirements
-```
-pip install pandas numpy matplotlib seaborn scikit-learn lime
-```
-
-### Steps
-```bash
-# Step 1 — Generate dataset
-python simulation/generate_sensor_data.py
-
-# Step 2 — Run EDA
-python eda/eda_01_overview.py
-python eda/eda_02_irrigation.py
-# ... run each EDA script
-
-# Step 3 — Run ML models
-python ml/ml_01_random_forest.py
-python ml/ml_02_svm.py
-python ml/ml_03_isolation_forest.py
-python ml/lime_explanation.py
-```
-
----
 
 ## ⚠️ Limitations
 
 - Dataset is simulated — real IoT sensor deployments would show stronger diurnal cycles and more complex inter-sensor dependencies
 - Hourly patterns are flat due to simulation — real sensors show clear temperature peaks at 13:00–15:00h
 - Class imbalance in Irrigate Now (~528 rows) — addressed with class_weight=balanced in RF
-- Isolation Forest anomaly labels are unsupervised — ground truth validation would require real field data
 
 ---
 
