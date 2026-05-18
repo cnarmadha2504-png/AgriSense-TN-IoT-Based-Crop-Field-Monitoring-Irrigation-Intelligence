@@ -19,44 +19,6 @@ AgriSense TN is an end-to-end IoT data analysis project that simulates real-time
 | Coimbatore | Tomato | Major vegetable farming belt |
 
 ---
-
-## 📂 Project Structure
-
-```
-agrisense-tn/
-│
-├── data/
-│   ├── agrisense_sensor_data.csv       # Simulated IoT sensor dataset
-│   ├── agrisense_predictions.csv       # ML model predictions
-│   └── agrisense_anomaly_results.csv   # Isolation Forest anomaly results
-│
-├── simulation/
-│   └── generate_sensor_data.py         # IoT data simulation script
-│
-├── eda/
-│   ├── eda_01_overview.py              # Data overview & statistics
-│   ├── eda_02_irrigation.py            # Irrigation label distribution
-│   ├── eda_03_sensor_distributions.py  # Sensor histograms by crop
-│   ├── eda_04_seasonal_trends.py       # Monthly seasonal patterns
-│   ├── eda_05_correlation.py           # Sensor correlation heatmap
-│   ├── eda_06_anomaly.py               # Anomaly analysis
-│   └── eda_07_hourly.py                # Diurnal hourly patterns
-│
-├── ml/
-│   ├── ml_01_random_forest.py          # Random Forest classifier
-│   ├── ml_02_svm.py                    # SVM classifier
-│   ├── ml_03_isolation_forest.py       # Anomaly detection
-│   ├── ml_model_comparison.py          # RF vs SVM comparison
-│   └── lime_explanation.py             # LIME explainability
-│
-├── powerbi/
-│   └── agrisense_dashboard.pbix        # Power BI dashboard
-│
-└── README.md
-```
-
----
-
 ## 📊 Dataset Description
 
 **Type:** Simulated IoT time-series sensor data
@@ -139,10 +101,6 @@ This is standard practice in IoT research and smart agriculture projects where l
 - **Accuracy:** 93.36%
 - **Key params:** kernel=rbf, C=1.0, gamma=scale
 
-### 3. Isolation Forest
-- **Task:** Detect anomalous sensor readings
-- **Anomalies detected:** ~504 rows
-- **Types:** Drought, Flood, Heat Stress
 
 ### Model Comparison
 
@@ -234,7 +192,7 @@ python ml/lime_explanation.py
 | Python | Data simulation, EDA, ML |
 | pandas, numpy | Data manipulation |
 | matplotlib, seaborn | Visualization |
-| scikit-learn | ML models — RF, SVM, Isolation Forest |
+| scikit-learn | ML models — RF, SVM|
 | LIME | Model explainability |
 | Power BI | Interactive dashboard |
 | GitHub | Version control & portfolio |
@@ -243,9 +201,8 @@ python ml/lime_explanation.py
 
 ## 👩‍💻 Author
 
-**Narmadha C**
-Freelance CS Educator & Data Science Portfolio Builder
-📍 Coimbatore, Tamil Nadu
+**Narmadha V**
+
 
 ---
 
