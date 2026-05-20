@@ -172,15 +172,5 @@ The dashboard includes:
 | Power BI | Interactive dashboard |
 | GitHub | Version control & portfolio |
 
----
-
-## 👩‍💻 Author
-
-**Narmadha V**
-
 
 ---
-
-## 📄 License
-
-This project is open source and available under the MIT License.
