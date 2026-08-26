@@ -1,176 +1,66 @@
-# 🌾 AgriSense TN — IoT-Based Crop Field Monitoring & Irrigation Intelligence
+# AgriSense TN — IoT Crop Field Monitoring + Agentic Alerts
 
-> **Simulated IoT sensor data analysis for Tamil Nadu agriculture using Python, Machine Learning, LIME explainability, and Power BI dashboard**
+Simulated IoT crop-monitoring system for Tamil Nadu agricultural fields — combining classical ML, explainable AI, and an agentic decision-to-action loop that turns model predictions into farmer-facing SMS alerts.
 
----
+## Overview
 
-## 📌 Project Overview
+Real-time IoT sensor data from Tamil Nadu farms isn't publicly available, so this project simulates hourly field sensor readings (soil moisture, temperature, rainfall, nitrogen, humidity) for three crop/district pairs, then builds a full pipeline from raw data → prediction → explanation → **autonomous alert**.
 
-AgriSense TN is an end-to-end IoT data analysis project that simulates real-time crop field sensor monitoring across three major agricultural districts of Tamil Nadu. The project predicts irrigation needs, detects anomalies, and explains model decisions using LIME — mimicking real-world smart farming systems.
+The project has two layers:
+1. **ML layer** — predicts irrigation need from sensor data, with model explainability
+2. **Agentic layer** — decides whether an alert is needed and sends it automatically, closing the gap between "model output" and something a farmer can actually act on
 
----
+## Dataset
 
-## 🗺️ District & Crop Mapping
+- **Type:** Simulated IoT time-series data
+- **Region:** Tamil Nadu, India — Thanjavur (Rice), Erode (Turmeric), Coimbatore (Tomato)
+- **Period:** June – November 2024, hourly readings
+- **Size:** 13,107 rows × 11 columns
+- **Basis:** Generated from IMD (India Meteorological Department) seasonal climate patterns and ICAR agronomic guidelines, with injected noise and anomalies to mimic real field conditions
 
-| District | Crop | Reason |
-|---|---|---|
-| Thanjavur | Rice | Tamil Nadu's rice bowl — Cauvery delta region |
-| Erode | Turmeric | Largest turmeric market in Asia |
-| Coimbatore | Tomato | Major vegetable farming belt |
+**Target:** `irrigation_needed` — `No Action` / `Monitor` / `Irrigate Now`
 
----
-## 📊 Dataset Description
+**Features:** `soil_moisture`, `soil_temp_c`, `air_temp_c`, `humidity_pct`, `rainfall_mm`, `nitrogen_mg_kg`
 
-**Type:** Simulated IoT time-series sensor data
-**Period:** June – November 2024
-**Frequency:** Hourly readings
-**Total Records:** 13,107 rows × 11 columns
+## Pipeline
 
-### Why Simulated?
+### 1. Data Simulation & EDA
+- Synthetic sensor generation with realistic noise (prevents trivial 100% accuracy)
+- Crop-wise distribution analysis, monthly trends, correlation heatmaps, anomaly detection, diurnal patterns
 
-Real-time IoT sensor data from Tamil Nadu agricultural fields is not publicly available. This dataset was synthetically generated based on:
-- **IMD (India Meteorological Department)** seasonal climate patterns for Tamil Nadu
-- **ICAR agronomic guidelines** for crop-specific soil requirements
-- **Realistic sensor noise** and anomaly injection to mimic real field conditions
-
-This is standard practice in IoT research and smart agriculture projects where live sensor infrastructure is unavailable.
-
-### Dataset Columns
-
-| Column | Unit | Description |
-|---|---|---|
-| timestamp | datetime | Hourly reading timestamp |
-| district | categorical | Thanjavur / Erode / Coimbatore |
-| crop | categorical | Rice / Turmeric / Tomato |
-| soil_moisture | % | Volumetric water content in soil |
-| soil_temp_c | °C | Soil temperature at 10cm depth |
-| air_temp_c | °C | Ambient air temperature |
-| humidity_pct | % | Relative humidity |
-| rainfall_mm | mm | Hourly rainfall measurement |
-| nitrogen_mg_kg | mg/kg | Soil nitrogen concentration |
-| anomaly | categorical | Normal / Drought Stress / Flood / Heat Stress |
-| irrigation_needed | categorical | **Target** — Irrigate Now / Monitor / No Action |
-
-### Target Variable Distribution
-
-| Label | Meaning | Count |
-|---|---|---|
-| No Action | Soil moisture adequate | ~6,400 |
-| Monitor | Borderline — watch closely | ~6,100 |
-| Irrigate Now | Urgent irrigation needed | ~528 |
-
-### Seasonal Patterns Applied
-
-| Month | Condition |
+### 2. Modeling
+| Model | Accuracy |
 |---|---|
-| June – July | Early Northeast monsoon — high rainfall, high humidity |
-| August – September | Peak monsoon — maximum soil moisture |
-| October – November | Retreating monsoon — moisture starts dropping |
+| Random Forest | 95.65% |
+| SVM (RBF kernel) | 93.71% |
 
-### Anomalies Injected (~4%)
+### 3. Explainability
+- **Feature importance** (Random Forest) and **permutation importance** (SVM) — soil moisture consistently ranks as the top predictor, mirroring how a farmer would actually reason
+- **LIME** — per-prediction, human-readable explanations for individual field readings
 
-| Type | Description |
-|---|---|
-| Drought Stress | Sudden soil moisture drop, zero rainfall |
-| Flood/Overwatering | Moisture spike, excess rainfall |
-| Heat Stress | Air and soil temperature spike |
+### 4. Agentic Layer
+The ML model predicts; the agent decides what to do about it and acts:
 
----
+```
+Perceive → sensor reading (soil moisture, rainfall, nitrogen, etc.)
+Decide   → RF model predicts label + rule-based reasoning generates a plain-language "why"
+           → No Action stays silent (avoids alert fatigue)
+Act      → Claude API turns the decision into an SMS-style message → sent via WhatsApp/Twilio
+Observe  → outcome logged for the next monitoring cycle
+```
 
-## 🔍 Exploratory Data Analysis
+This is what separates it from a static dashboard: the system decides *and* acts, instead of waiting for someone to open a notebook and read a chart.
 
-| Analysis | Finding |
-|---|---|
-| Highest moisture crop | Rice (Thanjavur) — ~80% median soil moisture |
-| Most irrigation alerts | Tomato (Coimbatore) — lowest base moisture |
-| Peak rainfall months | July–August — Northeast monsoon effect |
-| Anomaly rate | ~4% across all districts |
-| Key correlation | Soil moisture strongly drives irrigation label |
+## Tech Stack
 
----
-
-## 🤖 Machine Learning Models
-
-### 1. Random Forest Classifier
-- **Task:** Predict irrigation need (3 classes)
-- **Accuracy:** 95.65%
-- **Key params:** n_estimators=50, max_depth=6, class_weight=balanced
-
-### 2. SVM Classifier
-- **Task:** Predict irrigation need (3 classes)
-- **Accuracy:** 93.36%
-- **Key params:** kernel=rbf, C=1.0, gamma=scale
-
-
-### Model Comparison
-
-| Model | Accuracy | F1 (weighted) |
-|---|---|---|
-| **Random Forest** | **95.65%** | **0.95** |
-| SVM | 93.36% | 0.93 |
-
-Random Forest outperformed SVM overall. However SVM showed competitive performance on majority classes. RF is recommended for deployment due to better recall on the critical **Irrigate Now** minority class.
-
-### Feature Importance (Random Forest)
-
-| Feature | Importance |
-|---|---|
-| soil_moisture | 55.3% |
-| rainfall_mm | 21.2% |
-| humidity_pct | 7.4% |
-| nitrogen_mg_kg | 7.5% |
-| air_temp_c | 4.1% |
-| soil_temp_c | 4.3% |
-
-Soil moisture emerged as the dominant predictor — consistent with agronomic decision-making where direct soil water content is the primary irrigation trigger.
-
----
-
-## 💡 LIME Explainability
-
-LIME (Local Interpretable Model-agnostic Explanations) was used to explain individual predictions — identifying which sensor readings most influenced each irrigation alert.
-
-**Example explanation for a Monitor prediction:**
-- soil_moisture low → +0.37 push toward irrigate alert
-- rainfall_mm low → -0.09 offsetting factor
-- nitrogen_mg_kg low → -0.10 offsetting factor
-- Net result → Monitor (not urgent enough for Irrigate Now)
-
-This bridges the gap between model accuracy and real-world trust — a farmer will act on an explained alert, not a black box prediction.
-
----
-
-## 📈 Power BI Dashboard
-
-The dashboard includes:
-- **Page 1 — Overview:** KPI cards, irrigation donut chart, anomaly distribution, seasonal slicer
-- **Page 2 — Sensor Analysis:** Soil moisture by crop, monthly trends, sensor summary table
-- **Page 3 — Irrigation Alerts:** District-wise alert map, monthly alert trends
-- **Page 4 — ML Results:** Model accuracy comparison, feature importance, confusion matrix
-
----
+`Python` · `pandas` / `numpy` · `scikit-learn` · `XGBoost` · `LIME` · `Claude API (Anthropic)` · `Twilio (SMS)` · `Power BI` · `matplotlib` / `seaborn`
 
 
 
-## ⚠️ Limitations
+## Author
 
-- Dataset is simulated — real IoT sensor deployments would show stronger diurnal cycles and more complex inter-sensor dependencies
-- Hourly patterns are flat due to simulation — real sensors show clear temperature peaks at 13:00–15:00h
-- Class imbalance in Irrigate Now (~528 rows) — addressed with class_weight=balanced in RF
+Narmadha — [LinkedIn / GitHub links]
 
----
+## Disclaimer
 
-## 🛠️ Tech Stack
-
-| Tool | Purpose |
-|---|---|
-| Python | Data simulation, EDA, ML |
-| pandas, numpy | Data manipulation |
-| matplotlib, seaborn | Visualization |
-| scikit-learn | ML models — RF, SVM|
-| LIME | Model explainability |
-| Power BI | Interactive dashboard |
-| GitHub | Version control & portfolio |
-
-
----
+Sensor data is synthetically generated for demonstration purposes and does not represent real-time measurements from actual Tamil Nadu farms.
